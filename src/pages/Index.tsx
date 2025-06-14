@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingBag, Users, Sparkles, Heart, Share2, Camera, Star, ArrowRight, CheckCircle, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ProductGrid from '../components/ProductGrid';
 import TryOnModal from '../components/TryOnModal';
 import SocialFeed from '../components/SocialFeed';
@@ -67,9 +68,9 @@ const Index = () => {
             
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-700 hover:text-black transition-colors font-medium">Features</a>
-              <a href="#products" className="text-gray-700 hover:text-black transition-colors font-medium">Shop</a>
+              <Link to="/shop" className="text-gray-700 hover:text-black transition-colors font-medium">Shop</Link>
               <a href="#" className="text-gray-700 hover:text-black transition-colors font-medium">Try-On</a>
-              <a href="/ai-stylist" className="text-gray-700 hover:text-black transition-colors font-medium">AI Stylist</a>
+              <Link to="/ai-stylist" className="text-gray-700 hover:text-black transition-colors font-medium">AI Stylist</Link>
             </nav>
 
             <div className="flex items-center space-x-4">
@@ -188,6 +189,20 @@ const Index = () => {
       {/* Products Section */}
       <section id="products" className="py-24 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-light text-white mb-6">Featured Collection</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Discover our curated selection of premium fashion pieces, handpicked by our style experts.
+            </p>
+            <Link 
+              to="/shop"
+              className="inline-flex items-center space-x-2 bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            >
+              <span>View All Products</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+          
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Product Grid */}
             <div className="lg:col-span-3">
