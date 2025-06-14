@@ -69,7 +69,7 @@ const Index = () => {
               <a href="#features" className="text-gray-700 hover:text-black transition-colors font-medium">Features</a>
               <a href="#products" className="text-gray-700 hover:text-black transition-colors font-medium">Shop</a>
               <a href="#" className="text-gray-700 hover:text-black transition-colors font-medium">Try-On</a>
-              <a href="#" className="text-gray-700 hover:text-black transition-colors font-medium">AI Stylist</a>
+              <a href="/ai-stylist" className="text-gray-700 hover:text-black transition-colors font-medium">AI Stylist</a>
             </nav>
 
             <div className="flex items-center space-x-4">
