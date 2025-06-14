@@ -1,15 +1,42 @@
 
 import React, { useState } from 'react';
-import { Sparkles, Wand2, TrendingUp, Target, User, Camera, Upload, Palette, Zap, Heart, Share2, ArrowLeft } from 'lucide-react';
+import { Sparkles, TrendingUp, Target, User, Camera, Palette, Zap, Heart, Share2, ArrowLeft, Shirt } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { VirtualTryOn } from '@/components/VirtualTryOn';
 
-const AIStyler = () => {
-  const [selectedStyle, setSelectedStyle] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [activeTab, setActiveTab] = useState('recommendations');
-  const [uploadedImage, setUploadedImage] = useState(null);
+type StyleCategory = {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
 
-  const styleCategories = [
+type Recommendation = {
+  id: number;
+  type: string;
+  confidence: number;
+  reason: string;
+  item: string;
+  price: string;
+  image: string;
+};
+
+type StyleProfile = {
+  bodyType: string;
+  preferredColors: string[];
+  stylePersonality: string;
+  budget: string;
+  occasions: string[];
+};
+
+const AIStyler: React.FC = () => {
+  const [selectedStyle, setSelectedStyle] = useState<string>('');
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'virtual-tryon' | 'recommendations'>('virtual-tryon');
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
+  const styleCategories: StyleCategory[] = [
     { id: 'minimalist', name: 'Minimalist', icon: User },
     { id: 'bohemian', name: 'Bohemian', icon: Palette },
     { id: 'classic', name: 'Classic', icon: Target },
@@ -18,7 +45,7 @@ const AIStyler = () => {
     { id: 'romantic', name: 'Romantic', icon: Heart }
   ];
 
-  const recommendations = [
+  const recommendations: Recommendation[] = [
     {
       id: 1,
       type: "Perfect Match",
@@ -57,7 +84,7 @@ const AIStyler = () => {
     }
   ];
 
-  const styleProfile = {
+  const styleProfile: StyleProfile = {
     bodyType: "Hourglass",
     preferredColors: ["Navy", "Cream", "Burgundy", "Forest Green"],
     stylePersonality: "Classic with Modern Touches",
@@ -65,18 +92,15 @@ const AIStyler = () => {
     occasions: ["Professional", "Casual", "Date Night"]
   };
 
-  const analyzeLook = () => {
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-    }, 3000);
-  };
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => setUploadedImage(e.target.result);
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setUploadedImage(e.target.result as string);
+        }
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -85,161 +109,69 @@ const AIStyler = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link to="/" className="flex items-center space-x-2 text-gray-600 hover:text-black transition-colors">
-                <ArrowLeft className="w-5 h-5" />
-                <span>Back to Shop</span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <h1 className="text-xl font-semibold text-gray-900">AI Personal Stylist</h1>
-            </div>
-            <div className="w-20"></div>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <Link to="/" className="flex items-center text-gray-700 hover:text-gray-900">
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            <span className="text-lg font-medium">Back to Home</span>
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">AI Stylist</h1>
+          <div className="w-8"></div> {/* For spacing */}
         </div>
+
+  
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar - Style Profile */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Upload Section */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Your Look</h3>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                {uploadedImage ? (
-                  <img src={uploadedImage} alt="Uploaded" className="w-full h-40 object-cover rounded-lg mb-4" />
-                ) : (
-                  <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label
-                  htmlFor="image-upload"
-                  className="cursor-pointer bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center space-x-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  <span>Upload Photo</span>
-                </label>
-                <p className="text-gray-500 text-sm mt-2">Get style analysis from your outfit photos</p>
-              </div>
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <Tabs 
+          value={activeTab} 
+          onValueChange={(value: 'virtual-tryon' | 'recommendations') => setActiveTab(value)} 
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2 max-w-md mb-6">
+            <TabsTrigger value="virtual-tryon" className="flex items-center gap-2">
+              <Shirt className="h-4 w-4" />
+              Virtual Try-On
+            </TabsTrigger>
+            <TabsTrigger value="recommendations" className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Style Recommendations
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="virtual-tryon" className="mt-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold mb-6">Virtual Try-On</h2>
+              <p className="text-gray-600 mb-6">
+                Upload your photo and a garment to see how it looks on you using our AI-powered virtual try-on technology.
+              </p>
+              <VirtualTryOn />
             </div>
+          </TabsContent>
 
-            {/* Style Categories */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Style Preferences</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {styleCategories.map((style) => (
-                  <button
-                    key={style.id}
-                    onClick={() => setSelectedStyle(style.id)}
-                    className={`p-3 rounded-lg border transition-colors ${
-                      selectedStyle === style.id
-                        ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+          <TabsContent value="recommendations" className="mt-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold mb-6">Style Recommendations</h2>
+            
+            {!uploadedImage ? (
+              <div className="text-center py-12">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+                  <Camera className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">Upload a photo to get started</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Upload your photo to receive personalized style recommendations.
+                </p>
+                <div className="mt-6">
+                  <Button
+                    onClick={() => setActiveTab('virtual-tryon')}
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
-                    <style.icon className="w-4 h-4 mx-auto mb-1" />
-                    <span className="text-xs font-medium">{style.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Style Profile */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Style Profile</h3>
-              <div className="space-y-3">
-                <div>
-                  <span className="text-sm font-medium text-gray-700">Body Type:</span>
-                  <p className="text-gray-900">{styleProfile.bodyType}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700">Style Personality:</span>
-                  <p className="text-gray-900">{styleProfile.stylePersonality}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700">Budget Range:</span>
-                  <p className="text-gray-900">{styleProfile.budget}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700">Preferred Colors:</span>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {styleProfile.preferredColors.map((color) => (
-                      <span
-                        key={color}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                      >
-                        {color}
-                      </span>
-                    ))}
-                  </div>
+                    <Camera className="mr-2 h-4 w-4" />
+                    Open Camera
+                  </Button>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            {/* Action Bar */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex space-x-4">
-                  <button
-                    onClick={() => setActiveTab('recommendations')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'recommendations'
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Recommendations
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('analysis')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'analysis'
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Style Analysis
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('outfits')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === 'outfits'
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Complete Outfits
-                  </button>
-                </div>
-                <button
-                  onClick={analyzeLook}
-                  disabled={isAnalyzing}
-                  className="bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center space-x-2 disabled:opacity-50"
-                >
-                  <Wand2 className={`w-4 h-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
-                  <span>{isAnalyzing ? 'Analyzing...' : 'Get New Recommendations'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Recommendations Grid */}
-            {activeTab === 'recommendations' && (
-              <div className="grid md:grid-cols-2 gap-6">
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recommendations.map((recommendation) => (
                   <div key={recommendation.id} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div className="aspect-w-3 aspect-h-4">
@@ -289,94 +221,10 @@ const AIStyler = () => {
                 ))}
               </div>
             )}
-
-            {/* Style Analysis */}
-            {activeTab === 'analysis' && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">AI Style Analysis</h3>
-                <div className="space-y-6">
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <User className="w-8 h-8 text-gray-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 mb-1">Body Analysis</h4>
-                      <p className="text-gray-600 text-sm">Personalized fit recommendations based on your measurements</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Palette className="w-8 h-8 text-gray-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 mb-1">Color Analysis</h4>
-                      <p className="text-gray-600 text-sm">Colors that complement your skin tone and style</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <TrendingUp className="w-8 h-8 text-gray-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 mb-1">Trend Matching</h4>
-                      <p className="text-gray-600 text-sm">Current trends aligned with your personal style</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900 mb-3">Your Style DNA</h4>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium text-gray-700">Primary Style:</span>
-                        <span className="text-gray-900 ml-2">Classic Professional</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Secondary Style:</span>
-                        <span className="text-gray-900 ml-2">Modern Minimalist</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Color Season:</span>
-                        <span className="text-gray-900 ml-2">Deep Autumn</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Style Confidence:</span>
-                        <span className="text-gray-900 ml-2">92%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Complete Outfits */}
-            {activeTab === 'outfits' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Complete Outfit Suggestions</h3>
-                  <p className="text-gray-600 mb-6">Curated head-to-toe looks based on your style profile</p>
-                  
-                  <div className="grid gap-6">
-                    {['Work Day Chic', 'Weekend Casual', 'Date Night Elegant'].map((outfit, index) => (
-                      <div key={outfit} className="border border-gray-200 rounded-lg p-6">
-                        <h4 className="font-semibold text-gray-900 mb-3">{outfit}</h4>
-                        <div className="grid grid-cols-4 gap-4">
-                          {[1, 2, 3, 4].map((item) => (
-                            <div key={item} className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                              <span className="text-gray-500 text-xs">Item {item}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex justify-between items-center mt-4">
-                          <span className="text-lg font-semibold text-gray-900">Total: $485</span>
-                          <button className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
-                            Try Complete Look
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
-        </div>
-      </div>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };
